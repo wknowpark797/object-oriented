@@ -14,6 +14,10 @@ class FontStyle {
 		// 내부에는 합쳐진 옵션 객체를 활용
 		this.result = { ...this.default, ...option };
 
+		bindingEvent();
+	}
+
+	bindingEvent() {
 		this.el.addEventListener('click', () => {
 			if (this.result.type === 'all') {
 				this.changeSize(this.result.size);
