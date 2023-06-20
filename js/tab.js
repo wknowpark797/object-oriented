@@ -1,4 +1,4 @@
-// ES5
+/* ES5 */
 var tab = document.querySelector('#tab');
 var btns = tab.querySelectorAll('ul li');
 var boxs = tab.querySelectorAll('article div');
@@ -20,7 +20,7 @@ function activation(arr, idx) {
 	arr[idx].classList.add('on');
 }
 
-// 객체 지향 ES5
+/* 객체 지향 ES5 */
 new Tab('#tab', {
 	btns: 'ul li',
 	boxs: 'article div',
@@ -34,28 +34,26 @@ function Tab(selector, option) {
 
 	this.btns.forEach(
 		function (btn, idx) {
-			// forEach 안쪽에서 this는 인스턴스가 아닌 window 객체
+			// forEach 안쪽에서의 this는 인스턴스가 아닌 window 객체
 			console.log('forEach: ', this);
 
 			btn.addEventListener(
 				'click',
 				function () {
-					// event 안쪽에서 this는 이벤트 발생 대상
+					// event 안쪽에서의 this는 이벤트 발생 대상
 					console.log('event: ', this);
 
 					[this.btns, this.boxs].forEach(
 						function (el) {
 							this.activation(el, idx);
 						}.bind(this)
-						// 버튼, 박스 반복 forEach 안쪽의 this 값을 인스턴스로 고정
+						// forEach 안쪽의 this 값을 인스턴스로 고정
 					);
 				}.bind(this)
-				// forEach 안쪽의 인스턴스 this 객체값을 다시 이벤트 안쪽의 this 객체 값으로 고정
-				// 이벤트문 안쪽의 this 값을 인스턴스로 고정
+				// event 안쪽의 this 값을 인스턴스로 고정
 			);
 		}.bind(this)
-		// forEach 바깥의 인스턴스 this 객체를 forEach 안쪽의 this 객체 값으로 고정
-		// 버튼 반복 forEach 안쪽의 this 값을 인스턴스로 고정
+		// forEach 안쪽의 this 값을 인스턴스로 고정
 	);
 }
 
