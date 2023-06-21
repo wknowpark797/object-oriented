@@ -68,7 +68,16 @@ function anime(selector, option) {
 		// progress 값이 적용되는 targetValue 값도 딱 정수로 떨어지게 된다. (px 단위에서 중요!)
 		progress < 0 && (progress = 0);
 		progress > 1 && (progress = 1);
-		progress < 1 && requestAnimationFrame(move);
+
+		// 종료시 callback 실행
+		progress < 1 ? requestAnimationFrame(move) : option.callback && option.callback();
+		/*
+			if (progress < 1) {
+				requestAnimationFrame(move);
+			} else {
+				if (option.callback) option.callback();
+			}
+		*/
 
 		// 고정된 반복횟수 안에서 제어할 수 있는것은 각 반복 사이클마다의 변화량이기 때문에 변경하려고 하는 targetValue 값에 진행률을 곱하여 변화량을 제어
 		selector.style[option.prop] = option.value * progress + 'px';
