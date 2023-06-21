@@ -20,9 +20,9 @@ const box = document.querySelector('#box');
 
 // 1초 동안 500px 이동
 btn.addEventListener('click', () => {
-	anime(box, {
-		prop: 'opacity',
-		value: 1,
+	anime(window, {
+		prop: 'scroll',
+		value: 1000,
 		duration: 1000,
 		callback: () => {
 			// 모션이 끝났을 때 실행
@@ -34,9 +34,13 @@ btn.addEventListener('click', () => {
 function anime(selector, option) {
 	const startTime = performance.now();
 	console.log('시작시간: ', startTime);
+	let currentValue = null;
 	let count = 0;
 
-	let currentValue = parseFloat(getComputedStyle(selector)[option.prop]);
+	// option 객체의 prop 속성명이 scroll일 경우 scrollY값 활용 나머지의 경우 getComputedStyle로 스타일값 활용
+	option.prop === 'scroll'
+		? (currentValue = selector.scrollY)
+		: parseFloat(getComputedStyle(selector)[option.prop]);
 
 	// 현재 selector 요소에 적용되어 있는 css 값을 가져온뒤, parseInt를 활용하여 숫자값으로 변경
 	const isString = typeof option.value;
@@ -125,6 +129,8 @@ function anime(selector, option) {
 		if (isString === 'string') selector.style[option.prop] = result + '%';
 		// 속성명이 opacity일 경우 실수값을 그대로 스타일에 적용
 		else if (option.prop === 'opacity') selector.style[option.prop] = result;
+		// 속셩명이 scroll일 경우
+		else if (option.prop === 'scroll') selector.scroll(0, result);
 		else selector.style[option.prop] = result + 'px';
 	}
 }

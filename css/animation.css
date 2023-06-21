@@ -10,6 +10,10 @@ li {
   list-style: none;
 }
 
+body {
+  height: 5000px;
+}
+
 #wrap {
   width: 1000px;
   height: 600px;
