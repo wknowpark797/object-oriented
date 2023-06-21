@@ -15,51 +15,56 @@
 		-> 고정된 반복횟수 안에서 변화량을 제어할 수 있다.
 */
 
-// 1초 동안 500px 이동
 const btn = document.querySelector('button');
 const box = document.querySelector('#box');
-const speed = 1000;
-const targetValue = 500;
-let num = 0;
-let startTime = 0;
-let count = 0;
 
+// 1초 동안 500px 이동
 btn.addEventListener('click', () => {
-	startTime = performance.now();
+	anime(box, {
+		prop: 'margin-left',
+		value: 500,
+		duration: 1000,
+	});
+});
+
+function anime(selector, option) {
+	let startTime = performance.now();
+	let count = 0;
+
 	console.log('시작시간: ', startTime);
 
 	requestAnimationFrame(move);
-});
 
-function move(time) {
-	/*
-		console.log('각 반복사이클 마다의 누적시간: ', time);
-		num++;
-		box.style.marginLeft = num + 'px';
-		if (num >= 60) {
-			console.log('총 모션 시간: ', time - startTime);
-			return;
+	function move(time) {
+		/*
+			console.log('각 반복사이클 마다의 누적시간: ', time);
+			num++;
+			box.style.marginLeft = num + 'px';
+			if (num >= 60) {
+				console.log('총 모션 시간: ', time - startTime);
+				return;
+			}
+		*/
+
+		// timelast: 각 사이클 마다 걸리는 누적시간
+		let timelast = time - startTime;
+
+		/*
+			progress
+			- 지정한 시간에 대한 진행률
+			- 설정한 시간대비 현재 반복되는 모션 진행상황을 0 ~ 1 사이의 소수점으로 나타내주는 진행률 (100을 곱하면 백분율)
+			- 매 반복횟수마다 현재 걸리는 누적 시간값을 전체시간으로 나누면 0 ~ 1 사이의 실수로 반환 가능
+		*/
+		let progress = timelast / option.duration;
+		console.log('누적시간: ', timelast);
+		console.log('진행률: ', progress);
+		console.log('반복횟수: ', count++);
+
+		if (progress < 1) {
+			requestAnimationFrame(move);
 		}
-	*/
 
-	// timelast: 각 사이클 마다 걸리는 누적시간
-	let timelast = time - startTime;
-
-	/*
-		progress
-		- 지정한 시간에 대한 진행률
-		- 설정한 시간대비 현재 반복되는 모션 진행상황을 0 ~ 1 사이의 소수점으로 나타내주는 진행률 (100을 곱하면 백분율)
-		- 매 반복횟수마다 현재 걸리는 누적 시간값을 전체시간으로 나누면 0 ~ 1 사이의 실수로 반환 가능
-	*/
-	let progress = timelast / speed;
-	console.log('누적시간: ', timelast);
-	console.log('진행률: ', progress);
-	console.log('반복횟수: ', count++);
-
-	if (progress < 1) {
-		requestAnimationFrame(move);
+		// 고정된 반복횟수 안에서 제어할 수 있는것은 각 반복 사이클마다의 변화량이기 때문에 변경하려고 하는 targetValue 값에 진행률을 곱하여 변화량을 제어
+		selector.style[option.prop] = option.value * progress + 'px';
 	}
-
-	// 고정된 반복횟수 안에서 제어할 수 있는것은 각 반복 사이클마다의 변화량이기 때문에 변경하려고 하는 targetValue 값에 진행률을 곱하여 변화량을 제어
-	box.style.marginLeft = targetValue * progress + 'px';
 }
