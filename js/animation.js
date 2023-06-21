@@ -24,6 +24,10 @@ btn.addEventListener('click', () => {
 		prop: 'margin-left',
 		value: 500,
 		duration: 1000,
+		callback: () => {
+			// 모션이 끝났을 때 실행
+			console.log('end');
+		},
 	});
 });
 
@@ -60,9 +64,11 @@ function anime(selector, option) {
 		console.log('진행률: ', progress);
 		console.log('반복횟수: ', count++);
 
-		if (progress < 1) {
-			requestAnimationFrame(move);
-		}
+		// progress 값이 시작시 음수로 떨어지거나 종료시 1을 넘는 경우를 각각 0, 1로 보정
+		// progress 값이 적용되는 targetValue 값도 딱 정수로 떨어지게 된다. (px 단위에서 중요!)
+		progress < 0 && (progress = 0);
+		progress > 1 && (progress = 1);
+		progress < 1 && requestAnimationFrame(move);
 
 		// 고정된 반복횟수 안에서 제어할 수 있는것은 각 반복 사이클마다의 변화량이기 때문에 변경하려고 하는 targetValue 값에 진행률을 곱하여 변화량을 제어
 		selector.style[option.prop] = option.value * progress + 'px';
