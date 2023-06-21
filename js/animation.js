@@ -21,8 +21,8 @@ const box = document.querySelector('#box');
 // 1초 동안 500px 이동
 btn.addEventListener('click', () => {
 	anime(box, {
-		prop: 'margin-left',
-		value: 100,
+		prop: 'margin-top',
+		value: '50%',
 		duration: 1000,
 		callback: () => {
 			// 모션이 끝났을 때 실행
@@ -36,8 +36,35 @@ function anime(selector, option) {
 	console.log('시작시간: ', startTime);
 	let count = 0;
 
+	let currentValue = parseInt(getComputedStyle(selector)[option.prop]);
+
 	// 현재 selector 요소에 적용되어 있는 css 값을 가져온뒤, parseInt를 활용하여 숫자값으로 변경
-	const currentValue = parseInt(getComputedStyle(selector)[option.prop]);
+	const isString = typeof option.value;
+	if (isString === 'string') {
+		// option.value 값이 문자열일 경우 기존의 currentValue 값도 % 처리를 해야한다.
+		// %로 값을 변화하기 위해서 부모요소의 전체 넓이, 전체 높이값을 구해야 한다.
+		// getComputedStyle는 %값도 px로 변환하여 반환해준다.
+		const parentWidth = parseInt(getComputedStyle(selector.parentElement).width);
+		const parentHeight = parseInt(getComputedStyle(selector.parentElement).height);
+
+		// 가로축, 세로축으로 %로 적용될만한 속성명을 배열로 그룹화 (반복처리를 위해)
+		const x = ['margin-left', 'margin-right', 'left', 'right', 'width'];
+		const y = ['margin-top', 'margin-bottom', 'top', 'bottom', 'height'];
+
+		// option.prop 값으로 위의 배열로 설정한 속성이 들어온다면 currentValue 값을 부모요소의 크기 대비 %로 변환 처리
+		for (let cond of x) {
+			if (option.prop === cond) {
+				currentValue = (currentValue / parentWidth) * 100;
+			}
+		}
+		for (let cond of y) {
+			if (option.prop === cond) {
+				currentValue = (currentValue / parentHeight) * 100;
+			}
+		}
+
+		option.value = parseInt(option.value);
+	}
 
 	// 모션 처리
 	option.value !== currentValue && requestAnimationFrame(run);
@@ -84,6 +111,9 @@ function anime(selector, option) {
 
 		// 고정된 반복횟수 안에서 제어할 수 있는것은 각 반복 사이클마다의 변화량이기 때문에 변경하려고 하는 targetValue 값에 진행률을 곱하여 변화량을 제어
 		let result = currentValue + (option.value - currentValue) * progress;
-		selector.style[option.prop] = result + 'px';
+
+		// 속성값이 %일 경우와 px일 경우 분기처리
+		if (isString === 'string') selector.style[option.prop] = result + '%';
+		else selector.style[option.prop] = result + 'px';
 	}
 }

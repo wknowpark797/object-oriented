@@ -1,8 +1,15 @@
 @import 'reset';
 
+#wrap {
+	width: 1000px;
+	height: 600px;
+	border: 1px solid red;
+}
+
 #box {
 	width: 100px;
 	height: 100px;
 	background: green;
-	margin-left: 500px;
+	margin-left: 100px;
+	margin-top: 20px;
 }
