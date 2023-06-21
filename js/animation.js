@@ -1,7 +1,5 @@
 /*
 	[ 원하는 시간동안 정밀하게 모션 처리하기 ]
-
-  [ performance 객체 ]
   
   performance.now();
 	- 브라우저가 로딩된 순간부터 해당 구문이 호출된 시점까지의 시간을 ms 단위로 반환
@@ -18,7 +16,7 @@
 const btn = document.querySelector('button');
 const box = document.querySelector('#box');
 
-// 1초 동안 500px 이동
+// 1초 동안 모션 실행
 btn.addEventListener('click', () => {
 	anime(window, {
 		prop: 'scroll',
@@ -32,29 +30,29 @@ btn.addEventListener('click', () => {
 });
 
 function anime(selector, option) {
-	const startTime = performance.now();
-	console.log('시작시간: ', startTime);
+	const startTime = performance.now(); // 시작시간
 	let currentValue = null;
 	let count = 0;
 
 	// option 객체의 prop 속성명이 scroll일 경우 scrollY값 활용 나머지의 경우 getComputedStyle로 스타일값 활용
 	option.prop === 'scroll'
 		? (currentValue = selector.scrollY)
-		: parseFloat(getComputedStyle(selector)[option.prop]);
+		: (currentValue = parseFloat(getComputedStyle(selector)[option.prop]));
 
-	// 현재 selector 요소에 적용되어 있는 css 값을 가져온뒤, parseInt를 활용하여 숫자값으로 변경
+	// value 속성으로 받은 값이 문자열(%값)이라면 정수가 아닌 실수로 값을 변환한다.
 	const isString = typeof option.value;
 	if (isString === 'string') {
-		// option.value 값이 문자열일 경우 기존의 currentValue 값도 % 처리를 해야한다.
-		// %로 값을 변화하기 위해서 부모요소의 전체 넓이, 전체 높이값을 구해야 한다.
-		// getComputedStyle는 %값도 px로 변환하여 반환해준다.
+		/*
+			value 속성값이 문자열(%값)이라면 기존의 currentValue 값도 %로 처리해준다.
+			-> getComputedStyle는 %값을 px 단위로 변환하여 반환해주기 때문
+			-> %로 값을 변환하기 위해서 부모요소의 전체 넓이와 전체 높이값을 가져와서 값을 구한다.
+		*/
 		const parentWidth = parseInt(getComputedStyle(selector.parentElement).width);
 		const parentHeight = parseInt(getComputedStyle(selector.parentElement).height);
 
-		// 가로축, 세로축으로 %로 적용될만한 속성명을 배열로 그룹화 (반복처리를 위해)
+		// 가로축과 세로축이 %로 적용될만한 속성명들을 반복처리를 위해 배열로 그룹화한다.
 		const x = ['left', 'right', 'width'];
 		const y = ['top', 'bottom', 'height'];
-
 		const errProps = [
 			'margin-left',
 			'margin-right',
@@ -66,20 +64,17 @@ function anime(selector, option) {
 			'padding-bottom',
 		];
 
-		// %로 적용할 수 없는 속성값이 들어올 경우 경고문 출력 후 종료
+		// %로 적용할 수 없는 속성명의 경우 경고문 출력 후 종료
 		for (let cond of errProps)
-			if (option.prop === cond)
-				return console.error('margin, padding 값을 % 모션처리할 수 없습니다.');
+			if (option.prop === cond) return console.error('margin, padding 값은 %로 모션처리할 수 없습니다.');
 
-		// option.prop 값으로 위의 배열로 설정한 속성이 들어온다면 currentValue 값을 부모요소의 크기 대비 %로 변환 처리
+		// %값으로 처리해야하는 속성(배열로 설정한 속성)의 경우 currentValue 값을 부모요소의 크기를 활용하여 %값으로 변환 처리한다.
 		for (let cond of x) option.prop === cond && (currentValue = (currentValue / parentWidth) * 100);
-		for (let cond of y)
-			option.prop === cond && (currentValue = (currentValue / parentHeight) * 100);
+		for (let cond of y) option.prop === cond && (currentValue = (currentValue / parentHeight) * 100);
 
-		option.value = parseInt(option.value);
+		option.value = parseFloat(option.value);
 	}
 
-	// 모션 처리
 	option.value !== currentValue && requestAnimationFrame(run);
 
 	function run(time) {
@@ -93,11 +88,10 @@ function anime(selector, option) {
 			}
 		*/
 
-		// timelast: 각 사이클 마다 걸리는 누적시간
-		let timelast = time - startTime;
+		let timelast = time - startTime; // 각 사이클 마다 걸리는 누적시간
 
 		/*
-			progress
+			[ progress ]
 			- 지정한 시간에 대한 진행률
 			- 설정한 시간대비 현재 반복되는 모션 진행상황을 0 ~ 1 사이의 소수점으로 나타내주는 진행률 (100을 곱하면 백분율)
 			- 매 반복횟수마다 현재 걸리는 누적 시간값을 전체시간으로 나누면 0 ~ 1 사이의 실수로 반환 가능
@@ -116,7 +110,7 @@ function anime(selector, option) {
 		progress < 1 ? requestAnimationFrame(run) : option.callback && option.callback();
 		/*
 			if (progress < 1) {
-				requestAnimationFrame(move);
+				requestAnimationFrame(run);
 			} else {
 				if (option.callback) option.callback();
 			}
@@ -125,12 +119,13 @@ function anime(selector, option) {
 		// 고정된 반복횟수 안에서 제어할 수 있는것은 각 반복 사이클마다의 변화량이기 때문에 변경하려고 하는 targetValue 값에 진행률을 곱하여 변화량을 제어
 		let result = currentValue + (option.value - currentValue) * progress;
 
-		// 속성값이 %일 경우와 px일 경우 분기처리
+		// value값이 %단위의 경우
 		if (isString === 'string') selector.style[option.prop] = result + '%';
-		// 속성명이 opacity일 경우 실수값을 그대로 스타일에 적용
+		// prop 속성명이 opacity일 경우 실수값을 그대로 스타일에 적용
 		else if (option.prop === 'opacity') selector.style[option.prop] = result;
-		// 속셩명이 scroll일 경우
+		// prop 속성명이 scroll일 경우 window의 scroll값 적용
 		else if (option.prop === 'scroll') selector.scroll(0, result);
+		// value값이 px단위의 경우
 		else selector.style[option.prop] = result + 'px';
 	}
 }
