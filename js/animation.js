@@ -21,8 +21,8 @@ const box = document.querySelector('#box');
 // 1초 동안 500px 이동
 btn.addEventListener('click', () => {
 	anime(box, {
-		prop: 'margin-top',
-		value: '50%',
+		prop: 'opacity',
+		value: 1,
 		duration: 1000,
 		callback: () => {
 			// 모션이 끝났을 때 실행
@@ -36,7 +36,7 @@ function anime(selector, option) {
 	console.log('시작시간: ', startTime);
 	let count = 0;
 
-	let currentValue = parseInt(getComputedStyle(selector)[option.prop]);
+	let currentValue = parseFloat(getComputedStyle(selector)[option.prop]);
 
 	// 현재 selector 요소에 적용되어 있는 css 값을 가져온뒤, parseInt를 활용하여 숫자값으로 변경
 	const isString = typeof option.value;
@@ -123,6 +123,8 @@ function anime(selector, option) {
 
 		// 속성값이 %일 경우와 px일 경우 분기처리
 		if (isString === 'string') selector.style[option.prop] = result + '%';
+		// 속성명이 opacity일 경우 실수값을 그대로 스타일에 적용
+		else if (option.prop === 'opacity') selector.style[option.prop] = result;
 		else selector.style[option.prop] = result + 'px';
 	}
 }
