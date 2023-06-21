@@ -48,20 +48,29 @@ function anime(selector, option) {
 		const parentHeight = parseInt(getComputedStyle(selector.parentElement).height);
 
 		// 가로축, 세로축으로 %로 적용될만한 속성명을 배열로 그룹화 (반복처리를 위해)
-		const x = ['margin-left', 'margin-right', 'left', 'right', 'width'];
-		const y = ['margin-top', 'margin-bottom', 'top', 'bottom', 'height'];
+		const x = ['left', 'right', 'width'];
+		const y = ['top', 'bottom', 'height'];
+
+		const errProps = [
+			'margin-left',
+			'margin-right',
+			'padding-left',
+			'padding-right',
+			'margin-top',
+			'margin-bottom',
+			'padding-top',
+			'padding-bottom',
+		];
+
+		// %로 적용할 수 없는 속성값이 들어올 경우 경고문 출력 후 종료
+		for (let cond of errProps)
+			if (option.prop === cond)
+				return console.error('margin, padding 값을 % 모션처리할 수 없습니다.');
 
 		// option.prop 값으로 위의 배열로 설정한 속성이 들어온다면 currentValue 값을 부모요소의 크기 대비 %로 변환 처리
-		for (let cond of x) {
-			if (option.prop === cond) {
-				currentValue = (currentValue / parentWidth) * 100;
-			}
-		}
-		for (let cond of y) {
-			if (option.prop === cond) {
-				currentValue = (currentValue / parentHeight) * 100;
-			}
-		}
+		for (let cond of x) option.prop === cond && (currentValue = (currentValue / parentWidth) * 100);
+		for (let cond of y)
+			option.prop === cond && (currentValue = (currentValue / parentHeight) * 100);
 
 		option.value = parseInt(option.value);
 	}
