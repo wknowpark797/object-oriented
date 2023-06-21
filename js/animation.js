@@ -22,7 +22,7 @@ const box = document.querySelector('#box');
 btn.addEventListener('click', () => {
 	anime(box, {
 		prop: 'margin-left',
-		value: 500,
+		value: 100,
 		duration: 1000,
 		callback: () => {
 			// 모션이 끝났을 때 실행
@@ -32,14 +32,17 @@ btn.addEventListener('click', () => {
 });
 
 function anime(selector, option) {
-	let startTime = performance.now();
+	const startTime = performance.now();
+	console.log('시작시간: ', startTime);
 	let count = 0;
 
-	console.log('시작시간: ', startTime);
+	// 현재 selector 요소에 적용되어 있는 css 값을 가져온뒤, parseInt를 활용하여 숫자값으로 변경
+	const currentValue = parseInt(getComputedStyle(selector)[option.prop]);
+	if (option.value === currentValue) return;
+	if (option.value > currentValue) requestAnimationFrame(plus);
+	if (option.value < currentValue) requestAnimationFrame(minus);
 
-	requestAnimationFrame(move);
-
-	function move(time) {
+	function plus(time) {
 		/*
 			console.log('각 반복사이클 마다의 누적시간: ', time);
 			num++;
@@ -70,7 +73,7 @@ function anime(selector, option) {
 		progress > 1 && (progress = 1);
 
 		// 종료시 callback 실행
-		progress < 1 ? requestAnimationFrame(move) : option.callback && option.callback();
+		progress < 1 ? requestAnimationFrame(plus) : option.callback && option.callback();
 		/*
 			if (progress < 1) {
 				requestAnimationFrame(move);
@@ -80,6 +83,19 @@ function anime(selector, option) {
 		*/
 
 		// 고정된 반복횟수 안에서 제어할 수 있는것은 각 반복 사이클마다의 변화량이기 때문에 변경하려고 하는 targetValue 값에 진행률을 곱하여 변화량을 제어
-		selector.style[option.prop] = option.value * progress + 'px';
+		let result = currentValue + (option.value - currentValue) * progress;
+		selector.style[option.prop] = result + 'px';
+	}
+
+	function minus(time) {
+		let timelast = time - startTime;
+		let progress = timelast / option.duration;
+
+		progress < 0 && (progress = 0);
+		progress > 1 && (progress = 1);
+		progress < 1 ? requestAnimationFrame(minus) : option.callback && option.callback();
+
+		let result = currentValue - (currentValue - option.value) * progress;
+		selector.style[option.prop] = result + 'px';
 	}
 }
