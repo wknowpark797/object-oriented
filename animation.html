@@ -22,9 +22,9 @@
     const box = document.querySelector('#box');
 
     btn.addEventListener('click', () => {
-      new Anime(window, {
-        prop: 'scroll',
-        value: 1000,
+      new Anime(box, {
+        prop: 'left',
+        value: 500,
         duration: 1000,
       });
     });
