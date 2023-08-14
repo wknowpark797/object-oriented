@@ -34,6 +34,10 @@ class Tab {
 		this.tab = document.querySelector(selector);
 		this.btns = this.tab.querySelectorAll(result.btns);
 		this.boxs = this.tab.querySelectorAll(result.boxs);
+
+		// 해당 생성자를 통해서 복사가 될 인스턴스 객체를 강제로 고정시켜서 추후 해당 인스턴스의 property값 변경 자체를 막는다.
+		Object.freeze(this);
+
 		// this.bindingEvent();
 	}
 

@@ -32,11 +32,15 @@
     Tab.defaults = 'abc';
     console.log('변경 후 (동작X): ', tab1);
 
+    tab1.activation = 'aaa';
+
     // tab1이라는 인스턴스 객체의 tab 프로퍼티값을 외부에서 특정 값을 담아서 변경하려고 시도하면 자동으로 set 프로퍼티 접근자가 실행되면서 들어오는 값을 비교해서 원하는 값으로 변경이 되고 해당 프로퍼티를 읽을 때 자동으로 get 프로퍼티 접근자가 실행되면서 우리가 변경해놓은 값으로 읽히게 된다.
     // 클래스 생성자 내부에 보호하려고 하는 프로퍼티 값을 getter, setter로 구현해놓으면 해당 인스턴스 객체를 캡슐화 가능
     tab1.bindingEvent();
     tab1.tab = 'abc';
     console.log('변경 후 (변경X): ', tab1);
+
+    console.log('activation 실행: ', tab1);
 
     // Symbol: ES6 이후에 새로나온 자료형
     // Symbol은 자체적으로 Symbol타입의 객체를 만들어서 그 안에 매번 고유한 문자값을 담아주는 자료형
