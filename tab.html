@@ -37,6 +37,25 @@
     tab1.bindingEvent();
     tab1.tab = 'abc';
     console.log('변경 후 (변경X): ', tab1);
+
+    // Symbol: ES6 이후에 새로나온 자료형
+    // Symbol은 자체적으로 Symbol타입의 객체를 만들어서 그 안에 매번 고유한 문자값을 담아주는 자료형
+    const secret = Symbol();
+    const secret2 = Symbol();
+
+    console.log(secret === secret2);
+
+    // 계속해서 고유문자값으로 Symbol의 리턴값을 객체의 property의 변수로 치환하면
+    // 외부에서 해당 객체의 property에 접근하려고 할 때 key값을 알수가 없으므로 객체의 특정 property값을 캡슐화
+    const DB = {
+      [secret]: '1234'
+    }
+    // 코드의 구조를 알 경우 Symbol값을 변경할 수 있다. (캡슐화의 맹점)
+    // Symbol로 특정 프로퍼티값을 숨겼을지라도 치환되고 있는 프로퍼티의 변수명을 알고 있으면 연관배열형태로 접근이 가능 (Symbol의 캡슐화 맹점)
+    // -> 대안방법 : getter, setter, private
+    // DB[secret] = '1111';
+    console.log('DB: ', DB);
+
   </script>
 </body>
 
